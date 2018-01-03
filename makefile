@@ -11,28 +11,22 @@ default:
 ps_%:
 	ps -p $* -o %cpu,%mem,cmd
 
+qlogin_c02:
+	qlogin -l 'gpu=1,hostname=c02,h_rt=48:00:00'
+
 echo_%:
 	echo $($*)
 # ----------------- #
 # Semantic Commands #
 # ----------------- #
-# cut -d '      ' -f 1 ../../data/export/deep-ed-data/generated/wiki_hyperlink_contexts_RLTD.csv | uniq | wc -l
-# 3,845,731
-# All files in the $(DP)/generated/ folder containing the substring "_RLTD" are restricted to this set of entities (should contain 276,030 entities).
+learn_e2v: $(DP)/generated/ent_vecs/ent_vecs_ep_69.t7
 prepare_features: prepare_features_impl
-
-learn_e2v: ent_vecs_ep_69.t7
-
-qlogin_c02:
-	qlogin -l 'gpu=1,hostname=c02,h_rt=48:00:00'
-
-
 
 # --------------- #
 # Implementations #
 # --------------- #
 ## |& is shorthand for 2>&1
-ent_vecs_ep_69.t7:
+$(DP)/generated/ent_vecs/ent_vecs_ep_69.t7:
 	CUDNN_PATH="/home/ws15gkumar/.local/cudnn/lib64/libcudnn.so.5" CUDA_VISIBLE_DEVICES=$(FREE_GPU) th entities/learn_e2v/learn_a.lua -root_data_dir $(DP) |& tee $(DP)/logs/log_train_entity_vecs 
 
 
