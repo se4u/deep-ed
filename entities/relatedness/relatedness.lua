@@ -9,7 +9,7 @@
 
 if not opt then
   cmd = torch.CmdLine()
-  cmd:option('-root_data_dir', '', 'Root path of the data, $DATA_PATH.')
+  cmd:option('-root_data_dir', '/Users/rastogi/Downloads/deep-ed-data/', 'Root path of the data, $DATA_PATH.')
   cmd:text()
   opt = cmd:parse(arg or {})
   assert(opt.root_data_dir ~= '', 'Specify a valid root_data_dir path argument.')  
@@ -235,6 +235,7 @@ end
 --------------------------------------------------------------
 ------------------------ Main code ---------------------------
 --------------------------------------------------------------
+print('********* START ************')
 rel_test_txtfilename = opt.root_data_dir .. 'basic_data/relatedness/test.svm'
 rel_test_t7filename = opt.root_data_dir .. 'generated/relatedness_test.t7'
 

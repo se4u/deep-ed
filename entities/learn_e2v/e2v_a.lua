@@ -3,7 +3,9 @@
 assert(opt.num_words_per_ent)
 
 -- Word lookup:
-geom_w2v_M = w2vutils.M:float()
+if w2vutils ~= nil then
+   geom_w2v_M = w2vutils.M:float()
+end
 
 -- Stats:
 local num_invalid_ent_wikiids = 0

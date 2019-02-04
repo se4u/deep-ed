@@ -27,7 +27,7 @@ prepare_features: prepare_features_impl
 # --------------- #
 ## |& is shorthand for 2>&1
 $(DP)/generated/ent_vecs/ent_vecs_ep_69.t7:
-	CUDNN_PATH="/home/ws15gkumar/.local/cudnn/lib64/libcudnn.so.5" CUDA_VISIBLE_DEVICES=$(FREE_GPU) th entities/learn_e2v/learn_a.lua -root_data_dir $(DP) |& tee $(DP)/logs/log_train_entity_vecs 
+	CUDNN_PATH="/home/ws15gkumar/.local/cudnn/lib64/libcudnn.so.5" CUDA_VISIBLE_DEVICES=$(FREE_GPU) th entities/learn_e2v/learn_a.lua -root_data_dir $(DP) |& tee $(DP)/logs/log_train_entity_vecs
 
 
 prepare_features_impl:
@@ -80,3 +80,17 @@ $(DP)/generated/wikipedia_p_e_m.txt: $(DP)/basic_data
 
 $(DP)/basic_data:
 	echo "I downloaded basic_data.zip from google drive through w3m https://drive.google.com/uc?id=0Bx8d3azIm_ZcbHMtVmRVc1o5TWM&export=download"
+
+$(DP)/pretrained:
+	cd $(DP)
+	curl -L -O https://polybox.ethz.ch/index.php/s/sH2JSB2c1OSj7yv/download
+	mv download pretrained.zip
+	unzip pretrained.zip
+	mv deep_ed_data pretrained
+
+
+2mac:
+	-mkdir -p ~/Downloads/deep-ed-data/generated/
+	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/generated/relatedness*  ~/Downloads/deep-ed-data/generated/
+	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/generated/all_candidate_ents_ed_rltd_datasets_RLTD.t7  ~/Downloads/deep-ed-data/generated/
+	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/basic_data/relatedness ~/Downloads/deep-ed-data/
