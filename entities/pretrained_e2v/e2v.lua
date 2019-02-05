@@ -8,24 +8,29 @@ assert(opt.entities == 'RLTD', 'Only RLTD entities are currently supported. ALL 
 -- Defining variables:
 ent_vecs_size = 300
 
-geom_w2v_M = w2vutils.M:float()
+if w2vutils ~= nil then
+   geom_w2v_M = w2vutils.M:float()
+end
 
 e2vutils = {}
 
 -- Lookup table: ids -> tensor of vecs
 e2vutils.lookup = torch.load(opt.root_data_dir .. 'generated/ent_vecs/' .. opt.ent_vecs_filename)
-e2vutils.lookup = nn.Normalize(2):forward(e2vutils.lookup) -- Needs to be normalized to have norm 1.
-
-assert(e2vutils.lookup:size(1) == get_total_num_ents() and
-  e2vutils.lookup:size(2) == ent_vecs_size, e2vutils.lookup:size(1) .. ' ' .. get_total_num_ents())
-assert(e2vutils.lookup[unk_ent_thid]:norm() == 0, e2vutils.lookup[unk_ent_thid]:norm())
+e2vutils.lookup = nn.Normalize(2):forward(e2vutils.lookup:double()) -- Needs to be normalized to have norm 1.
+nument = e2vutils.lookup:size(1)
+print('e2vutils.lookup:size(1)', nument)
+assert(-- nument == get_total_num_ents() and
+   e2vutils.lookup:size(2) == ent_vecs_size,
+   nument .. ' ' -- .. get_total_num_ents()
+)
+-- assert(e2vutils.lookup[unk_ent_thid]:norm() == 0, e2vutils.lookup[unk_ent_thid]:norm())
 
 -- ent wikiid -> vec
 e2vutils.entwikiid2vec = function(self, ent_wikiid)
   local thid = get_thid(ent_wikiid)
   return self.lookup[thid]:float()
 end
-assert(torch.norm(e2vutils:entwikiid2vec(unk_ent_wikiid)) == 0)
+-- assert(torch.norm(e2vutils:entwikiid2vec(unk_ent_wikiid)) == 0)
 
 
 e2vutils.entname2vec = function (self,ent_name)
@@ -115,4 +120,4 @@ function geom_unit_tests()
   end
 end
 
-print('    Done reading e2v data. Entity vocab size = ' .. e2vutils.lookup:size(1))
+print('    Done reading e2v data. Entity vocab size = ' .. nument)

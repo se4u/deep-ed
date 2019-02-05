@@ -94,3 +94,7 @@ $(DP)/pretrained:
 	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/generated/relatedness*  ~/Downloads/deep-ed-data/generated/
 	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/generated/all_candidate_ents_ed_rltd_datasets_RLTD.t7  ~/Downloads/deep-ed-data/generated/
 	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/basic_data/relatedness ~/Downloads/deep-ed-data/
+
+# eval entity relatedness
+entrel:
+	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/
