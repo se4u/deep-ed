@@ -29,9 +29,9 @@ end
 -- Format: reltd = {query_id q -> (query_entity e1, entity_candidates cand) }
 --         cand = {e2 -> label}, where label is binary, if the candidate entity is related to e1
 function load_reltd_set(rel_t7filename, rel_txtfilename, set_type)
-  print('==> Loading relatedness ' .. set_type)
+  print('==> Loading relatedness ' .. set_type .. '   ' .. rel_t7filename)
   if not paths.filep(rel_t7filename) then
-    print('  ---> t7 file NOT found. Loading relatedness ' .. set_type .. ' from txt file instead (slower).')
+    print('  ---> t7 file NOT found. Loading relatedness ' .. set_type .. ' from txt file instead (slower).   ' .. rel_txtfilename)
     local reltd = tds.Hash()
     for line in io.lines(rel_txtfilename) do
       local parts = split(line, ' ')
@@ -250,7 +250,7 @@ local reltd_ents_direct_test = extract_reltd_ents(reltd_test)
 
 
 local rewtr_t7filename = opt.root_data_dir .. 'generated/all_candidate_ents_ed_rltd_datasets_RLTD.t7'
-print('==> Loading relatedness thid tensor')
+print('==> Loading relatedness thid tensor  ' .. rewtr_t7filename)
 if not paths.filep(rewtr_t7filename) then
   print('  ---> t7 file NOT found. Loading reltd_ents_wikiid_to_rltdid from txt file instead (slower).')
 
@@ -279,6 +279,7 @@ if not paths.filep(rewtr_t7filename) then
     'wned-aquaint.csv', 'wned-msnbc.csv', 'wned-ace2004.csv',
     'wned-clueweb.csv', 'wned-wikipedia.csv'}
   for _,f in pairs(files) do
+    print('Opening ' .. opt.root_data_dir .. 'generated/test_train_data/' .. f)
     it, _ = io.open(opt.root_data_dir .. 'generated/test_train_data/' .. f)
     local line = it:read()
     while line do

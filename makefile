@@ -93,8 +93,29 @@ $(DP)/pretrained:
 	-mkdir -p ~/Downloads/deep-ed-data/generated/
 	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/generated/relatedness*  ~/Downloads/deep-ed-data/generated/
 	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/generated/all_candidate_ents_ed_rltd_datasets_RLTD.t7  ~/Downloads/deep-ed-data/generated/
-	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/basic_data/relatedness ~/Downloads/deep-ed-data/
+	-mkdir -p ~/Downloads/deep-ed-data/basic_data/
+	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/basic_data/relatedness ~/Downloads/deep-ed-data/basic_data/
 
 # eval entity relatedness
-entrel:
-	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/
+
+entrel_canon:
+	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_54.t7
+
+entrel_hyperlink:
+	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93.t7
+
+# num_rltd_ents 276031 len(relset_thid2wid) 47730
+# err0 228300 err1 1242 err2 623
+entrel_t2a2b:
+	th eval_entrel.lua -print_thid_wikiid 1 -ent_vecs_filename ent_vecs__ep_54.t7 | fgrep thid_wikiid > ~/Downloads/deep-ed-data/generated/entrel_specific_wikiid.txt
+	python vae2t7impl.py # Writing /export/c02/prastog3/deep-ed-data/generated/ent_vecs/ent_vecs__vae2a2b.txt
+	th vae2t7impl.lua # Writing /export/c02/prastog3/deep-ed-data/generated/ent_vecs/ent_vecs__vae2a2b.t7
+	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__vae2a2b.t7
+
+entrel_canon_mimicvae:
+	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_54.t7
+	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_54_mimicvae.t7
+
+entrel_hyperlink_mimicvae:
+	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_93.t7
+	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93_mimicvae.t7

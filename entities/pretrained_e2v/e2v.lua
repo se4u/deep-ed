@@ -28,6 +28,9 @@ assert(-- nument == get_total_num_ents() and
 -- ent wikiid -> vec
 e2vutils.entwikiid2vec = function(self, ent_wikiid)
   local thid = get_thid(ent_wikiid)
+  if print_thid_wikiid == '1' then
+     print(tostring(thid) .. ' thid_wikiid ' .. ent_wikiid)
+  end
   return self.lookup[thid]:float()
 end
 -- assert(torch.norm(e2vutils:entwikiid2vec(unk_ent_wikiid)) == 0)

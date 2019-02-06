@@ -1,6 +1,14 @@
 require 'nn'
+cmd = torch.CmdLine()
+cmd:option('-root_data_dir',
+           '/Users/rastogi/Downloads/deep-ed-data/',
+           'Root path of the data, $DATA_PATH.')
+cmd:option('-ent_vecs_filename', 'ent_vecs__ep_54.t7',
+           'ent_vecs__vae2a2b.t7 ent_vecs__ep_93.t7')
+cmd:option('-print_thid_wikiid', '0', 'Pass 1 to print thid and corresponding wikiid')
+cmd:text()
+opt = cmd:parse(arg or {})
 dofile 'entities/relatedness/relatedness.lua'
-opt.ent_vecs_filename = 'ent_vecs__ep_54.t7'
 opt.entities = 'RLTD'
 unk_ent_thid = 1
 get_thid = function (ent_wikiid)
@@ -15,5 +23,6 @@ get_thid = function (ent_wikiid)
   end
   return ent_thid
 end
+print_thid_wikiid = opt.print_thid_wikiid
 dofile 'entities/pretrained_e2v/e2v.lua'
 compute_relatedness_metrics(entity_similarity)
