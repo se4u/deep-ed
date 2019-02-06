@@ -104,10 +104,8 @@ entrel_canon:
 entrel_hyperlink:
 	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93.t7
 
-# num_rltd_ents 276031 len(relset_thid2wid) 47730
-# err0 228300 err1 1242 err2 623
 entrel_t2a2b:
-	th eval_entrel.lua -print_thid_wikiid 1 -ent_vecs_filename ent_vecs__ep_54.t7 | fgrep thid_wikiid > ~/Downloads/deep-ed-data/generated/entrel_specific_wikiid.txt
+	th eval_entrel.lua -write_w2r 1 -ent_vecs_filename ent_vecs__ep_54.t7 ## Remnant of Attempt 1: | fgrep thid_wikiid > ~/Downloads/deep-ed-data/generated/entrel_specific_wikiid.txt
 	python vae2t7impl.py # Writing /export/c02/prastog3/deep-ed-data/generated/ent_vecs/ent_vecs__vae2a2b.txt
 	th vae2t7impl.lua # Writing /export/c02/prastog3/deep-ed-data/generated/ent_vecs/ent_vecs__vae2a2b.t7
 	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__vae2a2b.t7
@@ -119,3 +117,15 @@ entrel_canon_mimicvae:
 entrel_hyperlink_mimicvae:
 	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_93.t7
 	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93_mimicvae.t7
+
+
+ed_canon:
+	-mkdir $(DP)/generated/ed_models/
+	-mkdir $(DP)/generated/ed_models/training_plots/
+	CUDA_VISIBLE_DEVICES=$(FREE_GPU) th ed/ed.lua -model 'global' -root_data_dir $(DP) -ent_vecs_filename $(DP)/generated/ent_vecs/ent_vecs_ep_54.t7  |& tee $(DP)/logs/log_train_$@
+
+ed_hyperlink:
+	CUDA_VISIBLE_DEVICES=$(FREE_GPU) th ed/ed.lua -model 'global' -root_data_dir $(DP) -ent_vecs_filename $(DP)/generated/ent_vecs/ent_vecs_ep_93.t7  |& tee $(DP)/logs/log_train_$@
+
+ed_t2a2b:
+	CUDA_VISIBLE_DEVICES=$(FREE_GPU) th ed/ed.lua -model 'global' -root_data_dir $(DP) -ent_vecs_filename $(DP)/generated/ent_vecs/ent_vecs__vae2a2b.t7  |& tee $(DP)/logs/log_train_$@
