@@ -16,7 +16,12 @@ e2vutils = {}
 
 -- Lookup table: ids -> tensor of vecs
 e2vutils.lookup = torch.load(opt.root_data_dir .. 'generated/ent_vecs/' .. opt.ent_vecs_filename)
-e2vutils.lookup = nn.Normalize(2):forward(e2vutils.lookup:double()) -- Needs to be normalized to have norm 1.
+if tostring(torch.getdefaulttensortype()) == 'torch.DoubleTensor' then
+   e2vutils.lookup = e2vutils.lookup:double()
+else
+   e2vutils.lookup = e2vutils.lookup:float()
+end
+e2vutils.lookup = nn.Normalize(2):forward(e2vutils.lookup) -- Needs to be normalized to have norm 1.
 nument = e2vutils.lookup:size(1)
 print('e2vutils.lookup:size(1)', nument)
 assert(-- nument == get_total_num_ents() and

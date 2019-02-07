@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 DP := /export/c02/prastog3/deep-ed-data/
 DPD := $(DP)/generated/test_train_data
+CUDNN_PATH := /home/prastog3/tools/cudnn/cudnn-8.0-linux-x64-v5.1/lib64/libcudnn.so.5
 FREE_GPU = $(shell free-gpu)
 .PHONY:
 .SECONDARY:
@@ -27,7 +28,7 @@ prepare_features: prepare_features_impl
 # --------------- #
 ## |& is shorthand for 2>&1
 $(DP)/generated/ent_vecs/ent_vecs_ep_69.t7:
-	CUDNN_PATH="/home/ws15gkumar/.local/cudnn/lib64/libcudnn.so.5" CUDA_VISIBLE_DEVICES=$(FREE_GPU) th entities/learn_e2v/learn_a.lua -root_data_dir $(DP) |& tee $(DP)/logs/log_train_entity_vecs
+	CUDNN_PATH=$(CUDNN_PATH) CUDA_VISIBLE_DEVICES=$(FREE_GPU) th entities/learn_e2v/learn_a.lua -root_data_dir $(DP) |& tee $(DP)/logs/log_train_entity_vecs
 
 
 prepare_features_impl:
@@ -119,13 +120,14 @@ entrel_hyperlink_mimicvae:
 	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93_mimicvae.t7
 
 
+qsub_cmd = qsub -l hostname="c*",gpu=1,mem_free=10G,ram_free=10G -V -j y -r yes -m ea -M pushpendre@jhu.edu -o $(DP)/logs/log_train_$@ -e $(DP)/logs/log_train_$@.err  -cwd ./ed.sh
 ed_canon:
 	-mkdir $(DP)/generated/ed_models/
 	-mkdir $(DP)/generated/ed_models/training_plots/
-	CUDA_VISIBLE_DEVICES=$(FREE_GPU) th ed/ed.lua -model 'global' -root_data_dir $(DP) -ent_vecs_filename $(DP)/generated/ent_vecs/ent_vecs_ep_54.t7  |& tee $(DP)/logs/log_train_$@
+	$(qsub_cmd) ent_vecs__ep_54.t7 $@ exec
 
 ed_hyperlink:
-	CUDA_VISIBLE_DEVICES=$(FREE_GPU) th ed/ed.lua -model 'global' -root_data_dir $(DP) -ent_vecs_filename $(DP)/generated/ent_vecs/ent_vecs_ep_93.t7  |& tee $(DP)/logs/log_train_$@
+	$(qsub_cmd) ent_vecs__ep_93.t7 $@ exec
 
 ed_t2a2b:
-	CUDA_VISIBLE_DEVICES=$(FREE_GPU) th ed/ed.lua -model 'global' -root_data_dir $(DP) -ent_vecs_filename $(DP)/generated/ent_vecs/ent_vecs__vae2a2b.t7  |& tee $(DP)/logs/log_train_$@
+	$(qsub_cmd) ent_vecs__vae2a2b.t7 $@ exec
