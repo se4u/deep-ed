@@ -310,14 +310,14 @@ local function test_one(banner, f1_scores, epoch)
     ' ; Micro F1 = ' .. f1_str)
   
   -- Lower learning rate if we got close to minimum
-  if banner == 'aida-A' and f1 >= 90 then
+  if banner == 'aida-A' and f1 >= opt.transition_valf1 then
     opt.lr = 1e-5
   end
   
   -- We slow down training a little bit if we passed the 90% F1 score threshold.
   -- And we start saving (good quality) models from now on.
   if banner == 'aida-A' then
-    if f1 >= 90.0 then
+    if f1 >= opt.transition_valf1 then
       opt.save = true
     else
       opt.save = false

@@ -121,13 +121,14 @@ entrel_hyperlink_mimicvae:
 
 
 qsub_cmd = qsub -l hostname="c*",gpu=1,mem_free=10G,ram_free=10G -V -j y -r yes -m ea -M pushpendre@jhu.edu -o $(DP)/logs/log_train_$@ -e $(DP)/logs/log_train_$@.err  -cwd ./ed.sh
-ed_canon:
+ed-canon%:
 	-mkdir $(DP)/generated/ed_models/
 	-mkdir $(DP)/generated/ed_models/training_plots/
-	$(qsub_cmd) ent_vecs__ep_54.t7 $@ exec
+	$(qsub_cmd) ent_vecs__ep_54.t7 $@ exec 88.6
 
-ed_hyperlink:
-	$(qsub_cmd) ent_vecs__ep_93.t7 $@ exec
+ed-t2a2b%:
+	$(qsub_cmd) ent_vecs__vae2a2b.t7 $@ exec 84.4
 
-ed_t2a2b:
-	$(qsub_cmd) ent_vecs__vae2a2b.t7 $@ exec
+ed-hyperlink:
+	$(qsub_cmd) ent_vecs__ep_93.t7 $@ exec 90.0
+

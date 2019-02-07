@@ -26,7 +26,7 @@ abbv['-loss'] = ''
 cmd:option('-opt', 'ADAM', 'Optimization method: SGD | ADADELTA | ADAGRAD | ADAM')
 abbv['-opt'] = ''
 
-cmd:option('-lr', 1e-4, 'Learning rate. Will be divided by 10 after validation F1 >= 90%.')
+cmd:option('-lr', 1e-4, 'Learning rate. Will be divided by 10 after validation F1 >= transition_f1%.')
 abbv['-lr'] = 'lr'
 
 cmd:option('-batch_size', 1, 'Batch size in terms of number of documents.')
@@ -85,6 +85,9 @@ cmd:option('-test_one_model_file', '', 'Saved pretrained model filename from fol
 ------------------ banner:
 cmd:option('-banner_header', '', ' Banner header to be used for plotting')
 
+
+------------------ transition_valf1
+cmd:option('-transition_valf1', 90.0, 'When validation F1 on Aida-A becomes >= transition_valf1% then we reduce learning rate and start saving the model')
 cmd:text()
 opt = cmd:parse(arg or {})
 
