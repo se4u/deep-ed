@@ -3,10 +3,16 @@ Validate the map using relwidset.
 '''
 from argparse import Namespace
 import numpy as np
-data_dir = '/export/c02/prastog3/deep-ed-data/'
+import sys
+try:
+  infn, outfn = sys.argv[1], sys.argv[2]
+except IndexError:
+  infn, outfn = 't2a2b.wiki.emb.npz', 'ent_vecs__vae2a2b.txt'
+
 args = Namespace()
-args.vae_npz = data_dir+'../thesis_entitylinking/t2a2b.wiki.emb.npz'
-args.vae_txt = data_dir + 'generated/ent_vecs/ent_vecs__vae2a2b.txt'
+data_dir = '/export/c02/prastog3/deep-ed-data/'
+args.vae_npz = data_dir + f'../thesis_entitylinking/{infn}'
+args.vae_txt = data_dir + f'generated/ent_vecs/{outfn}'
 args.name2wid = data_dir + 'basic_data/wiki_name_id_map.txt'
 args.wid2thid = data_dir + 'generated/reltd_ents_wikiid_to_rltdid.txt'
 
@@ -36,7 +42,7 @@ with open(args.vae_txt, 'w') as f:
       err0 += 1
       f.write(default_emb)
       continue
-    
+
     wid = thid2wid[thid]
     try:
       name = wid2name[wid]
@@ -44,7 +50,7 @@ with open(args.vae_txt, 'w') as f:
       err1 += 1
       f.write(default_emb)
       continue
-    
+
     try:
       vid = name2vid[name]
     except:

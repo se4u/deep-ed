@@ -98,27 +98,37 @@ $(DP)/pretrained:
 	rsync -avz clsp:/export/c02/prastog3/deep-ed-data/basic_data/relatedness ~/Downloads/deep-ed-data/basic_data/
 
 # eval entity relatedness
-
+RDD := -root_data_dir /export/c02/prastog3/deep-ed-data/
 entrel_canon:
-	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_54.t7
+	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__ep_54.t7
 
 entrel_hyperlink:
-	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93.t7
+	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__ep_93.t7
+
+## Remnants of Attempt 1:
+## | fgrep thid_wikiid > ~/Downloads/deep-ed-data/generated/entrel_specific_wikiid.txt
+# entrel_canon_mimicvae:
+# 	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_54.t7
+# 	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__ep_54_mimicvae.t7
+
+# entrel_hyperlink_mimicvae:
+# 	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_93.t7
+# 	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__ep_93_mimicvae.t7
 
 entrel_t2a2b:
-	th eval_entrel.lua -write_w2r 1 -ent_vecs_filename ent_vecs__ep_54.t7 ## Remnant of Attempt 1: | fgrep thid_wikiid > ~/Downloads/deep-ed-data/generated/entrel_specific_wikiid.txt
-	python vae2t7impl.py # Writing /export/c02/prastog3/deep-ed-data/generated/ent_vecs/ent_vecs__vae2a2b.txt
-	th vae2t7impl.lua # Writing /export/c02/prastog3/deep-ed-data/generated/ent_vecs/ent_vecs__vae2a2b.t7
-	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__vae2a2b.t7
+	th eval_entrel.lua -write_w2r 1 -ent_vecs_filename ent_vecs__ep_54.t7
+	python vae2t7impl.py t2a2b.wiki.emb.npz ent_vecs__vae2a2b.txt
+	th vae2t7impl.lua -outfn ent_vecs__vae2a2b.t7
+	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__vae2a2b.t7
 
-entrel_canon_mimicvae:
-	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_54.t7
-	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_54_mimicvae.t7
+entrel_random:
+	th vae2t7impl.lua -random 1 -outfn ent_vecs__random.t7
+	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__random.t7
 
-entrel_hyperlink_mimicvae:
-	th mimicvae.lua -ent_vecs_filename ent_vecs__ep_93.t7
-	th eval_entrel.lua -root_data_dir /export/c02/prastog3/deep-ed-data/ -ent_vecs_filename ent_vecs__ep_93_mimicvae.t7
-
+entrel_t2a2bwv:
+	python vae2t7impl.py t2a2bwv.wiki.emb.npz ent_vecs__vae2a2bwv.txt
+	th vae2t7impl.lua -outfn ent_vecs__vae2a2bwv.t7
+	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__vae2a2bwv.t7
 
 qsub_cmd = qsub -l hostname="c*",gpu=1,mem_free=10G,ram_free=10G -V -j y -r yes -m ea -M pushpendre@jhu.edu -o $(DP)/logs/log_train_$@ -e $(DP)/logs/log_train_$@.err  -cwd ./ed.sh
 ed-canon%:
@@ -131,4 +141,3 @@ ed-t2a2b%:
 
 ed-hyperlink:
 	$(qsub_cmd) ent_vecs__ep_93.t7 $@ exec 90.0
-
