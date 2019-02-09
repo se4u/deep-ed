@@ -125,16 +125,30 @@ entrel_random:
 	th vae2t7impl.lua -random 1 -outfn ent_vecs__random.t7
 	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__random.t7
 
-entrel_t2a2bwv:
-	python vae2t7impl.py t2a2bwv.wiki.emb.npz ent_vecs__vae2a2bwv.txt
-	th vae2t7impl.lua -outfn ent_vecs__vae2a2bwv.t7
-	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__vae2a2bwv.t7
+# (2a2bwv, 2a2bwvE0, 2a2bwvmc10E0), 2a2bwvmc10
+entrel_t%:
+	ls /export/c02/prastog3/thesis_entitylinking/t$*.wiki.emb.npz
+	python vae2t7impl.py t$*.wiki.emb.npz ent_vecs__vae$*.txt
+	th vae2t7impl.lua -outfn ent_vecs__vae$*.t7
+	th eval_entrel.lua $(RDD) -ent_vecs_filename ent_vecs__vae$*.t7
 
 qsub_cmd = qsub -l hostname="c*",gpu=1,mem_free=10G,ram_free=10G -V -j y -r yes -m ea -M pushpendre@jhu.edu -o $(DP)/logs/log_train_$@ -e $(DP)/logs/log_train_$@.err  -cwd ./ed.sh
 ed-canon%:
 	-mkdir $(DP)/generated/ed_models/
 	-mkdir $(DP)/generated/ed_models/training_plots/
 	$(qsub_cmd) ent_vecs__ep_54.t7 $@ exec 88.6
+
+ed-t2a2bwvE0%:
+	$(qsub_cmd) ent_vecs__vae2a2bwvE0.t7 $@ exec 90.0
+
+ed-t2a2bwv%:
+	$(qsub_cmd) ent_vecs__vae2a2bwv.t7 $@ exec 90.0
+
+ed-t2a2bwvmc10E0%:
+	$(qsub_cmd) ent_vecs__vae2a2bwvmc10E0.t7 $@ exec 90.0
+
+ed-t2a2bwvmc10%:
+	$(qsub_cmd) ent_vecs__vae2a2bwv.t7 $@ exec 90.0
 
 ed-t2a2b%:
 	$(qsub_cmd) ent_vecs__vae2a2b.t7 $@ exec 84.4
